@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+
+
+            {%for  event in events %}
+
+                {{ event }}
+
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
