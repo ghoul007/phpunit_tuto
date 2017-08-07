@@ -4,11 +4,39 @@ namespace Tests\AppBundle\Controller;
 
 
 use AppBundle\Entity\Event;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class EventControllerTest extends WebTestCase
 {
 
+    private $client;
+    private $container;
+    private $em;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+
+        $this->client = static::createClient();
+
+        $this->container = $this->client->getContainer();
+        $this->em = $this->container->get('doctrine')->getManager();
+
+
+        static $metaData;
+        if (!isset($metaData)) {
+            $metaData = $this->em->getMetadataFactory()->getAllMetadata();
+        }
+
+        $schemaTool = new SchemaTool($this->em);
+        $schemaTool->dropDatabase();
+
+        if (!empty($metaData)) {
+            $schemaTool->createSchema($metaData);
+        }
+    }
 
     public function testindex_should_list_all_events()
     {
@@ -48,5 +76,13 @@ class EventControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains('event1', $client->getResponse()->getContent());
         $this->assertContains('event2', $client->getResponse()->getContent());
+    }
+
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        $this->em->close();
+        $this->em = null;
     }
 }
