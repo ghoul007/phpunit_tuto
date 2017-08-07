@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Controller;
 
 
+use AppBundle\Entity\Event;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class EventControllerTest extends WebTestCase
@@ -14,6 +15,11 @@ class EventControllerTest extends WebTestCase
         $client = static::createClient();
 
         $container = $client->getContainer();
+        $em = $container->get('doctrine')->getManager();
+
+
+        $entities = $em->getRepository('AppBundle:Event')->findAll();
+        $init = count($entities);
 //$container = static ::$karnel->getContainer();
         $event = new Event();
         $event->setName('Test MVC');
@@ -27,12 +33,15 @@ class EventControllerTest extends WebTestCase
 
 //        $em = $this->getDoctrine()->getManager();
 
-        $em = $container->get('doctrine')->getManager();
         $em->persist($event);
         $em->persist($event1);
         $em->flush();
 
+        $entities = $em->getRepository('AppBundle:Event')->findAll();
+        $final = count($entities);
 
+
+        $this->assertEquals($init + 2, $final);
 
 
         $crawler = $client->request('GET', '/events');
