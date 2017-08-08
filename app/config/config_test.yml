@@ -16,6 +16,7 @@ framework:
 doctrine:
     dbal:
         driver: pdo_sqlite
+#        memory: true
         path: '%kernel.project_dir%/var/data/data.sqlite'
 
 

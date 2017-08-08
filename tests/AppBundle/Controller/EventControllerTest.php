@@ -6,6 +6,7 @@ namespace Tests\AppBundle\Controller;
 use AppBundle\Entity\Event;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class EventControllerTest extends WebTestCase
 {
@@ -13,6 +14,7 @@ class EventControllerTest extends WebTestCase
     private $client;
     private $container;
     private $em;
+    private $crawler;
 
     protected function setUp()
     {
@@ -79,12 +81,33 @@ class EventControllerTest extends WebTestCase
         $this->assertEquals($init + 2, $final);
 
 
-        $crawler = $client->request('GET', '/events');
+        $this->crawler = $client->request('GET', '/events');
+
+//        try {
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('event1', $client->getResponse()->getContent());
-        $this->assertContains('event2', $client->getResponse()->getContent());
+        $this->assertContains('Test', $client->getResponse()->getContent());
+
+//        } catch (\Exception $e) {
+//            dump(get_class($e));
+//            dump($e->getMessage());
+//            dump($crawler->filter('.exception-message')->text());
+//            die;
+//        }
+//        $this->assertContains('event2', $client->getResponse()->getContent());
     }
 
+    protected function onNotSuccessfulTest(\Throwable $t)
+    {
+
+        if ($this->crawler && $this->crawler->filter('.exception-message')->count() > 0) {
+
+            $throwabale = get_class($t);
+
+            throw new $throwabale($t->getMessage() . '|' . $this->crawler->filter('.exception-message')->text());
+        }
+
+        throw $t;
+    }
 
     protected function tearDown()
     {
