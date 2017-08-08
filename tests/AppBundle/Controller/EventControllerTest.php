@@ -25,22 +25,22 @@ class EventControllerTest extends WebTestCase
         $this->em = $this->container->get('doctrine')->getManager();
 
 //first method
-//        static $metaData;
-//        if (!isset($metaData)) {
-//            $metaData = $this->em->getMetadataFactory()->getAllMetadata();
-//        }
-//
-//        $schemaTool = new SchemaTool($this->em);
-//        $schemaTool->dropDatabase();
-//
-//        if (!empty($metaData)) {
-//            $schemaTool->createSchema($metaData);
-//        }
+        static $metaData;
+        if (!isset($metaData)) {
+            $metaData = $this->em->getMetadataFactory()->getAllMetadata();
+        }
+
+        $schemaTool = new SchemaTool($this->em);
+        $schemaTool->dropDatabase();
+
+        if (!empty($metaData)) {
+            $schemaTool->createSchema($metaData);
+        }
 
 
         //second method
-        $this->em->beginTransaction();
-        $this->em->getConnection()->setAutoCommit(false);
+//        $this->em->beginTransaction();
+//        $this->em->getConnection()->setAutoCommit(false);
 
 
     }
@@ -90,7 +90,7 @@ class EventControllerTest extends WebTestCase
     {
         parent::tearDown();
 
-        $this->em->rollback();
+//        $this->em->rollback();
 
         $this->em->close();
         $this->em = null;
