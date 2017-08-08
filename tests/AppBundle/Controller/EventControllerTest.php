@@ -24,29 +24,36 @@ class EventControllerTest extends WebTestCase
         $this->container = $this->client->getContainer();
         $this->em = $this->container->get('doctrine')->getManager();
 
+//first method
+//        static $metaData;
+//        if (!isset($metaData)) {
+//            $metaData = $this->em->getMetadataFactory()->getAllMetadata();
+//        }
+//
+//        $schemaTool = new SchemaTool($this->em);
+//        $schemaTool->dropDatabase();
+//
+//        if (!empty($metaData)) {
+//            $schemaTool->createSchema($metaData);
+//        }
 
-        static $metaData;
-        if (!isset($metaData)) {
-            $metaData = $this->em->getMetadataFactory()->getAllMetadata();
-        }
 
-        $schemaTool = new SchemaTool($this->em);
-        $schemaTool->dropDatabase();
+        //second method
+        $this->em->beginTransaction();
+        $this->em->getConnection()->setAutoCommit(false);
 
-        if (!empty($metaData)) {
-            $schemaTool->createSchema($metaData);
-        }
+
     }
 
     public function testindex_should_list_all_events()
     {
         $client = static::createClient();
 
-        $container = $client->getContainer();
-        $em = $container->get('doctrine')->getManager();
+//        $container = $client->getContainer();
+//        $em = $container->get('doctrine')->getManager();
 
 
-        $entities = $em->getRepository('AppBundle:Event')->findAll();
+        $entities = $this->em->getRepository('AppBundle:Event')->findAll();
         $init = count($entities);
 //$container = static ::$karnel->getContainer();
         $event = new Event();
@@ -61,11 +68,11 @@ class EventControllerTest extends WebTestCase
 
 //        $em = $this->getDoctrine()->getManager();
 
-        $em->persist($event);
-        $em->persist($event1);
-        $em->flush();
+        $this->em->persist($event);
+        $this->em->persist($event1);
+        $this->em->flush();
 
-        $entities = $em->getRepository('AppBundle:Event')->findAll();
+        $entities = $this->em->getRepository('AppBundle:Event')->findAll();
         $final = count($entities);
 
 
@@ -82,6 +89,9 @@ class EventControllerTest extends WebTestCase
     protected function tearDown()
     {
         parent::tearDown();
+
+        $this->em->rollback();
+
         $this->em->close();
         $this->em = null;
     }
